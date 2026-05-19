@@ -1,0 +1,20 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+
+    volumes:
+      - uptime-kuma-prod-data:/app/data
+
+    cap_add:
+      - NET_RAW
+
+    security_opt:
+      - no-new-privileges:true
+
+    restart: always
+
+volumes:
+  uptime-kuma-prod-data:
