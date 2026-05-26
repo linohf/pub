@@ -84,6 +84,15 @@ kubectl describe hpa hpa-demo
 
 **Pasos detallados por entorno**
 
+**ANTES DE EMPEZAR: Setea tu usuario de Docker Hub como variable de entorno para que los comandos sean copy-paste:**
+
+```bash
+# Reemplaza linohf con tu usuario de Docker Hub
+export DOCKER_USER=linohf
+```
+
+Luego los ejemplos debajo usarán `$DOCKER_USER` automáticamente.
+
 ### k3d (local)
 
 1. Asegura que tienes un cluster k3d en marcha:
@@ -107,17 +116,17 @@ kubectl -n kube-system patch deployment metrics-server --type='json' -p='[{"op":
 
 ```bash
 # Desde AppFastAPIsimple
-docker build -t youruser/hpa-demo:1.0 .
-k3d image import --cluster mycluster youruser/hpa-demo:1.0
+docker build -t $DOCKER_USER/hpa-demo:1.0 .
+k3d image import --cluster mycluster $DOCKER_USER/hpa-demo:1.0
 kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
-kubectl set image deployment/hpa-demo app=youruser/hpa-demo:1.0
+kubectl set image deployment/hpa-demo app=$DOCKER_USER/hpa-demo:1.0
 kubectl rollout status deployment/hpa-demo
 ```
 
 - O usar Docker Hub (útil para replicar en la nube):
 
 ```bash
-DOCKER_USER=youruser TAG=1.0 ./deploy.sh
+TAG=1.0 ./deploy.sh
 ```
 
 4. Probar y generar carga:
@@ -146,14 +155,21 @@ gcloud container clusters get-credentials demo-cluster --region=us-central1
 3. Construye y sube la imagen a Google Container Registry (o usa Docker Hub):
 
 ```bash
-# Usando GCR
+# Opción A: Usando GCR
 gcloud auth configure-docker
 docker build -t gcr.io/YOUR_PROJECT_ID/hpa-demo:1.0 .
 docker push gcr.io/YOUR_PROJECT_ID/hpa-demo:1.0
-
-# Actualiza el deployment
 kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
 kubectl set image deployment/hpa-demo app=gcr.io/YOUR_PROJECT_ID/hpa-demo:1.0
+kubectl rollout status deployment/hpa-demo
+```
+
+```bash
+# Opción B: Usando Docker Hub (copy-paste con $DOCKER_USER)
+docker build -t $DOCKER_USER/hpa-demo:1.0 .
+docker push $DOCKER_USER/hpa-demo:1.0
+kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
+kubectl set image deployment/hpa-demo app=$DOCKER_USER/hpa-demo:1.0
 kubectl rollout status deployment/hpa-demo
 ```
 
@@ -178,10 +194,10 @@ az aks get-credentials -g myResourceGroup -n myAKSCluster
 
 2. Opciones para la imagen:
 
-- Push a Docker Hub y usar `deploy.sh`:
+- Push a Docker Hub y usar `deploy.sh` (con $DOCKER_USER):
 
 ```bash
-DOCKER_USER=youruser TAG=1.0 ./deploy.sh
+TAG=1.0 ./deploy.sh
 ```
 
 - O push a Azure Container Registry (ACR):
