@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import Response
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 import time
 import os
 
@@ -47,8 +47,8 @@ def cpu(duration: float = Query(1.0, description="Duration in seconds"),
         return cnt
 
     intensity = max(1, int(intensity))
-    # Use processes to actually consume multiple cores
-    with ProcessPoolExecutor(max_workers=intensity) as ex:
+    # Use threads for CPU stressing (more compatible)
+    with ThreadPoolExecutor(max_workers=intensity) as ex:
         futures = [ex.submit(_busy, duration) for _ in range(intensity)]
         results = [f.result() for f in futures]
 
