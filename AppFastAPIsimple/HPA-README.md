@@ -87,8 +87,13 @@ kubectl describe hpa hpa-demo
 **ANTES DE EMPEZAR: Setea tu usuario de Docker Hub como variable de entorno para que los comandos sean copy-paste:**
 
 ```bash
-# Reemplaza linohf con tu usuario de Docker Hub
+# En bash/WSL
 export DOCKER_USER=linohf
+```
+
+```powershell
+# En PowerShell (Windows)
+$env:DOCKER_USER="linohf"
 ```
 
 Luego los ejemplos debajo usarán `$DOCKER_USER` automáticamente.
