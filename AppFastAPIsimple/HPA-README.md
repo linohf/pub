@@ -298,6 +298,22 @@ Debería mostrar:
 - `ScalingActive   True` — HPA está activo y monitoreando
 - `Metrics: ... cpu: X%/50%` — Está capturando métricas de CPU
 
+**Ejemplo de salida correcta (escalado real observado):**
+```
+NAME       REFERENCE             TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+hpa-demo   Deployment/hpa-demo   cpu: 4%/50%          2         10        2          6m47s
+hpa-demo   Deployment/hpa-demo   cpu: 106%/50%        2         10        2          9m47s
+hpa-demo   Deployment/hpa-demo   cpu: 447%/50%        2         10        4          10m
+hpa-demo   Deployment/hpa-demo   cpu: 49%/50%         2         10        8          10m
+hpa-demo   Deployment/hpa-demo   cpu: 4%/50%          2         10        8          10m
+hpa-demo   Deployment/hpa-demo   cpu: 4%/50%          2         10        4          15m
+hpa-demo   Deployment/hpa-demo   cpu: 4%/50%          2         10        2          15m
+```
+
+Observa:
+- **cpu: 106% → 447%**: Replicas escalan de 2 → 4 → 8 (scale-up)
+- **cpu: 49% → 4%**: Replicas escalan de 8 → 4 → 2 (scale-down)
+
 ## Troubleshooting
 
 ### Check if metrics are available
