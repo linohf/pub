@@ -1,7 +1,0 @@
-#Build y push de imagen
-docker build -t tu-registry/hpa-demo:1.0 .
-docker push tu-registry/hpa-demo:1.0
-
-Ejemplo si usas Docker Hub:
-docker build -t linohf/hpa-demo:1.0 .
-docker push linohf/hpa-demo:1.0
