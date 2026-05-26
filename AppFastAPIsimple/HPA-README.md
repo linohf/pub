@@ -84,19 +84,21 @@ kubectl describe hpa hpa-demo
 
 **Pasos detallados por entorno**
 
-**ANTES DE EMPEZAR: Setea tu usuario de Docker Hub como variable de entorno para que los comandos sean copy-paste:**
+**ANTES DE EMPEZAR: Setea tus variables de entorno para que los comandos sean copy-paste:**
 
 ```bash
 # En bash/WSL
 export DOCKER_USER=linohf
+export CLUSTER_NAME=mi-cluster
 ```
 
 ```powershell
 # En PowerShell (Windows)
 $env:DOCKER_USER="linohf"
+$env:CLUSTER_NAME="mi-cluster"
 ```
 
-Luego los ejemplos debajo usarán `$DOCKER_USER` automáticamente.
+Luego los ejemplos debajo usarán `$DOCKER_USER` y `$CLUSTER_NAME` automáticamente.
 
 ### k3d (local)
 
@@ -105,7 +107,7 @@ Luego los ejemplos debajo usarán `$DOCKER_USER` automáticamente.
 ```bash
 k3d cluster list
 # si no existe, crea uno
-k3d cluster create mycluster
+k3d cluster create $CLUSTER_NAME
 ```
 
 2. Instala `metrics-server` si no está:
@@ -122,7 +124,7 @@ kubectl -n kube-system patch deployment metrics-server --type='json' -p='[{"op":
 ```bash
 # Desde AppFastAPIsimple
 docker build -t $DOCKER_USER/hpa-demo:1.0 .
-k3d image import --cluster mycluster $DOCKER_USER/hpa-demo:1.0
+k3d image import --cluster $CLUSTER_NAME $DOCKER_USER/hpa-demo:1.0
 kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
 kubectl set image deployment/hpa-demo app=$DOCKER_USER/hpa-demo:1.0
 kubectl rollout status deployment/hpa-demo
