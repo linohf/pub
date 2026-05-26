@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 # Simple deploy script: build, push, and deploy to Kubernetes
-# Usage: DOCKER_USER=myuser TAG=1.0 ./deploy.sh
+# Usage: DOCKER_USER=myuser TAG=1.0 ./scripts/deploy.sh
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT_DIR="$SCRIPT_DIR/.."
+cd "$ROOT_DIR"
 
 DOCKER_USER=${DOCKER_USER:-}
 TAG=${TAG:-1.0}
@@ -21,10 +25,10 @@ echo "Pushing $IMAGE"
 docker push "$IMAGE"
 
 echo "Applying manifests (deployment will be updated to use image)
-If deployment doesn't exist, apply manifests first with: kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml"
+If deployment doesn't exist, apply manifests first with: kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml -f k8s/hpa.yaml"
 
 # Ensure manifests exist
-kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml || true
+kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml -f k8s/hpa.yaml || true
 
 echo "Setting deployment image to $IMAGE"
 kubectl set image deployment/hpa-demo app="$IMAGE" --record

@@ -28,11 +28,11 @@ curl http://localhost:8000/cpu?duration=10&intensity=4
 
 ### Build and Run
 
-Use your Docker Hub username in place of YOUR_DOCKERHUB below. You can use the included `deploy.sh` script.
+Use your Docker Hub username in place of YOUR_DOCKERHUB below. You can use the included `scripts/deploy.sh` script.
 
 ```bash
 # Build, push and deploy (example)
-DOCKER_USER=YOUR_DOCKERHUB TAG=1.0 ./deploy.sh
+DOCKER_USER=YOUR_DOCKERHUB TAG=1.0 ./scripts/deploy.sh
 
 # Or build and run locally
 docker build -t YOUR_DOCKERHUB/hpa-demo:1.0 .
@@ -64,10 +64,10 @@ while true; do curl http://localhost:8000/cpu?duration=5&intensity=2; done
 
 ```bash
 # Use deploy script which builds, pushes and updates the deployment image
-DOCKER_USER=YOUR_DOCKERHUB TAG=1.0 ./deploy.sh
+DOCKER_USER=YOUR_DOCKERHUB TAG=1.0 ./scripts/deploy.sh
 
 # Or manually apply manifests once and then update image
-kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
+kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml -f k8s/hpa.yaml
 kubectl set image deployment/hpa-demo app=YOUR_DOCKERHUB/hpa-demo:1.0
 
 # Check deployment
@@ -133,7 +133,7 @@ kubectl get deployment metrics-server -n kube-system
 # Desde AppFastAPIsimple
 docker build -t $DOCKER_USER/hpa-demo:1.0 .
 k3d image import --cluster $CLUSTER_NAME $DOCKER_USER/hpa-demo:1.0
-kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
+kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml -f k8s/hpa.yaml
 kubectl set image deployment/hpa-demo app=$DOCKER_USER/hpa-demo:1.0
 kubectl rollout status deployment/hpa-demo
 ```
@@ -141,7 +141,7 @@ kubectl rollout status deployment/hpa-demo
 - O usar Docker Hub (útil para replicar en la nube):
 
 ```bash
-TAG=1.0 ./deploy.sh
+TAG=1.0 ./scripts/deploy.sh
 ```
 
 4. Probar y generar carga:
@@ -174,7 +174,7 @@ gcloud container clusters get-credentials demo-cluster --region=us-central1
 gcloud auth configure-docker
 docker build -t gcr.io/YOUR_PROJECT_ID/hpa-demo:1.0 .
 docker push gcr.io/YOUR_PROJECT_ID/hpa-demo:1.0
-kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
+kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml -f k8s/hpa.yaml
 kubectl set image deployment/hpa-demo app=gcr.io/YOUR_PROJECT_ID/hpa-demo:1.0
 kubectl rollout status deployment/hpa-demo
 ```
@@ -183,7 +183,7 @@ kubectl rollout status deployment/hpa-demo
 # Opción B: Usando Docker Hub (copy-paste con $DOCKER_USER)
 docker build -t $DOCKER_USER/hpa-demo:1.0 .
 docker push $DOCKER_USER/hpa-demo:1.0
-kubectl apply -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-hpa.yaml
+kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml -f k8s/hpa.yaml
 kubectl set image deployment/hpa-demo app=$DOCKER_USER/hpa-demo:1.0
 kubectl rollout status deployment/hpa-demo
 ```
@@ -209,10 +209,10 @@ az aks get-credentials -g myResourceGroup -n myAKSCluster
 
 2. Opciones para la imagen:
 
-- Push a Docker Hub y usar `deploy.sh` (con $DOCKER_USER):
+- Push a Docker Hub y usar `scripts/deploy.sh` (con $DOCKER_USER):
 
 ```bash
-TAG=1.0 ./deploy.sh
+TAG=1.0 ./scripts/deploy.sh
 ```
 
 - O push a Azure Container Registry (ACR):
@@ -235,8 +235,8 @@ kubectl rollout status deployment/hpa-demo
 
 Notas comunes:
 
-- Los archivos de manifest referenciados están en: [k8s-deployment.yaml](k8s-deployment.yaml), [k8s-service.yaml](k8s-service.yaml), [k8s-hpa.yaml](k8s-hpa.yaml) y el `deploy.sh` en [deploy.sh](deploy.sh).
-- Si usas registry privado, crea `imagePullSecrets` y referencia en `k8s-deployment.yaml`.
+- Los archivos de manifest referenciados están en: [k8s/deployment.yaml](../k8s/deployment.yaml), [k8s/service.yaml](../k8s/service.yaml), [k8s/hpa.yaml](../k8s/hpa.yaml) y el `deploy.sh` en [scripts/deploy.sh](../scripts/deploy.sh).
+- Si usas registry privado, crea `imagePullSecrets` y referencia en `k8s/deployment.yaml`.
 - Asegúrate de que `resources.requests.cpu` están presentes (HPA las necesita).
 
 
@@ -333,7 +333,7 @@ kubectl top nodes
 
 ## Configuration
 
-Edit `k8s-hpa.yaml` to adjust:
+Edit `k8s/hpa.yaml` to adjust:
 
 - `minReplicas`: Minimum number of pods (default: 2)
 - `maxReplicas`: Maximum number of pods (default: 10)

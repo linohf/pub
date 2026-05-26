@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # Build and push Docker image for HPA Demo
-# Usage: ./build-and-push.sh [version]
+# Usage: ./scripts/build-and-push.sh [version]
 # Default version: 1.0
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT_DIR="$SCRIPT_DIR/.."
+cd "$ROOT_DIR"
 
 VERSION=${1:-1.0}
 REGISTRY=${REGISTRY:-YOUR_DOCKERHUB}
@@ -22,5 +26,5 @@ echo ""
 echo "To push to Docker Hub (if deploy script not used):"
 echo "  docker push $FULL_IMAGE"
 echo ""
-echo "To update Kubernetes deployment, edit k8s-deployment.yaml and change:"
+echo "To update Kubernetes deployment, edit k8s/deployment.yaml and change:"
 echo "  image: $FULL_IMAGE"
