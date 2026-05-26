@@ -113,8 +113,16 @@ k3d cluster create $CLUSTER_NAME
 2. Instala `metrics-server` si no está:
 
 ```bash
+# En bash/WSL
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-kubectl -n kube-system patch deployment metrics-server --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]' || true
+kubectl -n kube-system patch deployment metrics-server --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]' 2>/dev/null || true
+
+# En PowerShell (Windows)
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl -n kube-system patch deployment metrics-server --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args","value":["--kubelet-insecure-tls"]}]' 2>$null
+
+# Verifica que está corriendo
+kubectl get deployment metrics-server -n kube-system
 ```
 
 3. Opciones para la imagen:
@@ -261,6 +269,35 @@ kubectl get pods --watch
 
 You should see pods scale up when CPU usage exceeds 50%, and scale down after stabilization.
 
+## Validate HPA is Working
+
+### Quick Check
+
+```bash
+# Ver si HPA escaló (debe mostrar > 2 replicas si hubo carga)
+kubectl get pods -l app=hpa-demo
+
+# Ver estado del HPA
+kubectl get hpa hpa-demo
+
+# Ver métricas en tiempo real
+kubectl top pods -l app=hpa-demo
+```
+
+### Detailed Status
+
+```bash
+# En bash/WSL
+kubectl describe hpa hpa-demo | grep -A 5 "Conditions:"
+
+# En PowerShell
+kubectl describe hpa hpa-demo | Select-String -A 5 "Conditions:"
+```
+
+Debería mostrar:
+- `ScalingActive   True` — HPA está activo y monitoreando
+- `Metrics: ... cpu: X%/50%` — Está capturando métricas de CPU
+
 ## Troubleshooting
 
 ### Check if metrics are available
@@ -276,6 +313,7 @@ kubectl top nodes
 1. Metrics server is running: `kubectl get deployment metrics-server -n kube-system`
 2. Pod resource requests are set (they are in the deployment)
 3. HPA status: `kubectl describe hpa hpa-demo`
+4. Pod logs for errors: `kubectl logs -l app=hpa-demo --tail=20`
 
 ## Configuration
 
